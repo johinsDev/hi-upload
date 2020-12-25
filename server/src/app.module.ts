@@ -6,6 +6,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import configuration from './config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { RedisModule } from './cache/redis.module';
 
 // Custom repository
 // compression
@@ -58,6 +59,16 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         } as TypeOrmModuleOptions;
       },
       inject: [ConfigService],
+    }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          host: '127.0.0.1',
+          port: 6379,
+        };
+      },
     }),
     AuthModule,
   ],
