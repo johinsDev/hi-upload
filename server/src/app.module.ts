@@ -7,7 +7,6 @@ import configuration from './config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
-// seeds
 // Custom repository
 // compression
 // helmet
@@ -16,6 +15,10 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 // docker
 // docker-compose
 // auth
+// auth 2fa
+// auth social
+// auth email, verification
+// auth phone, verification
 // storage
 // cache
 // swagger
@@ -27,6 +30,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 // sms
 // rate limiting
 // i18n
+// i18n models
 // cron
 // event emitter
 // excel, pdf, sharp, omnipay
