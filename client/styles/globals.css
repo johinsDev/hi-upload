@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply border-t-4 border-indigo-500;
+}
+
+h1 {
+  @apply text-3xl font-medium mb-3 text-gray-800;
+}
+
+p {
+  @apply text-gray-500;
+}
