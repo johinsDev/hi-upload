@@ -1,23 +1,28 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtModuleOptions, JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { RedisService } from '../cache/redis.service';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { HashService } from './hash.service';
 import { User } from './user.entity';
 import * as ms from 'ms';
 import { UserRepository } from './user.repository';
 import { TokenRepository } from './token.repository';
 import * as days from 'dayjs';
-import { Token } from './token.entity';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import { FastifyRequest } from 'fastify';
+import { Token } from './token.entity';
+import { MoreThan } from 'typeorm';
 
-// logout, loginViaId, check, autehtnticate
-// token repository, redis, emit envet user login, validate login and class-transformer
+export class InvalidApiToken extends HttpException {
+  constructor() {
+    super('Invalid API token', HttpStatus.UNAUTHORIZED);
+  }
+}
+
 @Injectable()
 export class AuthService {
-  uid: string;
+  uid: keyof User;
   user: User;
+  token: Token;
   isLoggedOut: boolean;
   isAuthenticated: boolean;
   authenticationAttempted: boolean;
@@ -28,7 +33,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly tokenRepository: TokenRepository,
-    @Inject(REQUEST) private readonly request: Request,
+    @Inject(REQUEST) private readonly request: FastifyRequest,
   ) {
     this.uid = 'email';
   }
@@ -53,6 +58,14 @@ export class AuthService {
   ): Promise<{ token: string }> {
     const token = this.jwt.sign({ [this.uid]: user[this.uid] }, options);
 
+    const tokens = await this.tokenRepository.find({
+      where: {
+        user,
+      },
+    });
+
+    await this.tokenRepository.remove(tokens);
+
     await this.tokenRepository
       .create({
         token,
@@ -71,29 +84,56 @@ export class AuthService {
     return { token };
   }
 
-  public async authenticate(): Promise<any> {
-    console.log(this.request.headers);
+  private getBearerToken(token?: string): string {
+    if (!token) {
+      throw new InvalidApiToken();
+    }
 
-    // /**
-    //  * Return early when authentication has already attempted for
-    //  * the current request
-    //  */
-    // if (this.authenticationAttempted) {
-    // 	return this.user
-    // }
-    // this.authenticationAttempted = true
-    // /**
-    //  * Ensure the "Authorization" header value exists
-    //  */
-    // const token = this.getBearerToken()
-    // const { tokenId, value } = this.parsePublicToken(token)
-    // /**
-    //  * Query token and user
-    //  */
-    // const providerToken = await this.getProviderToken(tokenId, value)
-    // const providerUser = await this.getUserById(providerToken.userId)
-    // this.markUserAsLoggedIn(providerUser.user, true)
-    // this.token = providerToken
+    const [type, value] = token.split(' ');
+
+    if (!type || type.toLowerCase() !== 'bearer' || !value) {
+      throw new InvalidApiToken();
+    }
+
+    return value;
+  }
+
+  public async authenticate(): Promise<User> {
+    if (this.authenticationAttempted) {
+      return this.user;
+    }
+
+    this.authenticationAttempted = true;
+
+    const token = this.getBearerToken(this.request.headers.authorization);
+
+    try {
+      this.jwt.verify(token);
+
+      const providerToken = await this.tokenRepository.findOneOrFail({
+        relations: ['user'],
+        where: [
+          {
+            expiresAt: MoreThan(days().format()),
+            token,
+          },
+        ],
+      });
+
+      this.token = providerToken;
+
+      this.markUserAsLoggedIn(providerToken.user, true);
+
+      return providerToken.user;
+    } catch (error) {
+      throw new InvalidApiToken();
+    }
+  }
+
+  public async check(): Promise<boolean> {
+    await this.authenticate();
+
+    return this.isAuthenticated;
   }
 
   public async verifyCredentials(uid: string, password: string): Promise<User> {
@@ -129,5 +169,38 @@ export class AuthService {
     } catch (error) {
       throw new Error('User nor found');
     }
+  }
+
+  public async logout(): Promise<void> {
+    if (!this.authenticationAttempted) {
+      await this.check();
+    }
+
+    if (this.token) {
+      await this.token.remove();
+    }
+
+    this.markUserAsLoggedOut();
+  }
+
+  protected markUserAsLoggedOut(): void {
+    this.isLoggedOut = true;
+    this.isAuthenticated = false;
+    this.user = null;
+  }
+
+  public async loginViaId(
+    id: string | number,
+    options?: JwtSignOptions,
+  ): Promise<any> {
+    const providerUser = await this.userRepository.findOneOrFail({
+      where: [
+        {
+          id,
+        },
+      ],
+    });
+
+    return this.login(providerUser, options);
   }
 }

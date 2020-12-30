@@ -38,7 +38,9 @@ import { RedisModule } from './cache/redis.module';
 // event emitter
 // excel, pdf, sharp, omnipay
 // audit, role, supcriptions
-
+// locust, jest, sonarQube, continuos deployment aws, terraform
+// terraform all servies on aws
+// cache typeorm with redis
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -58,6 +60,7 @@ import { RedisModule } from './cache/redis.module';
           synchronize: false,
           autoLoadEntities: true,
           namingStrategy: new SnakeNamingStrategy(),
+          logging: true,
         } as TypeOrmModuleOptions;
       },
       inject: [ConfigService],
