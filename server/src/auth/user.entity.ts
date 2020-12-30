@@ -5,7 +5,9 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Token } from './token.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -20,6 +22,12 @@ export class User extends BaseEntity {
 
   @Column()
   password: string;
+
+  @OneToMany(
+    () => Token,
+    token => token.user,
+  )
+  tokens: Token[];
 
   @Column({ type: 'timestamp', nullable: true })
   emailVerifiedAt: Date | null;

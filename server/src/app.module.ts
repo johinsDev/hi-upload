@@ -8,14 +8,16 @@ import { AuthModule } from './auth/auth.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { RedisModule } from './cache/redis.module';
 
-// Custom repository
+// auth simple token database
 // compression
 // helmet
-
+// cors
+// csrf
+// rate limiting
 // terminus
 // docker
 // docker-compose
-// auth
+
 // auth 2fa
 // auth social
 // auth email, verification
