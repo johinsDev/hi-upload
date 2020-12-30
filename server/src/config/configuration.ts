@@ -19,7 +19,7 @@ export default (): {
   jwt: {
     secret: process.env.jWT_SECRET || 'myHArdSecret',
     signOptions: {
-      expiresIn: process.env.jWT_EXPIRE_IN || '24h',
+      expiresIn: process.env.jWT_EXPIRE_IN || '15d',
     },
   },
 });

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModuleOptions, JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { RedisService } from '../cache/redis.service';
@@ -9,15 +9,18 @@ import { UserRepository } from './user.repository';
 import { TokenRepository } from './token.repository';
 import * as days from 'dayjs';
 import { Token } from './token.entity';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
 // logout, loginViaId, check, autehtnticate
-// token repository, redis, emit envet user login
+// token repository, redis, emit envet user login, validate login and class-transformer
 @Injectable()
 export class AuthService {
   uid: string;
   user: User;
   isLoggedOut: boolean;
   isAuthenticated: boolean;
+  authenticationAttempted: boolean;
 
   constructor(
     private userRepository: UserRepository,
@@ -25,6 +28,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly tokenRepository: TokenRepository,
+    @Inject(REQUEST) private readonly request: Request,
   ) {
     this.uid = 'email';
   }
@@ -55,7 +59,7 @@ export class AuthService {
         user,
         expiresAt: days()
           .add(
-            ms(this.config.get('jwt.signOptions.expiresIn', '24h')),
+            ms(this.config.get('jwt.signOptions.expiresIn', '15d')),
             'millisecond',
           )
           .format(),
@@ -65,6 +69,31 @@ export class AuthService {
     this.markUserAsLoggedIn(user, true);
 
     return { token };
+  }
+
+  public async authenticate(): Promise<any> {
+    console.log(this.request.headers);
+
+    // /**
+    //  * Return early when authentication has already attempted for
+    //  * the current request
+    //  */
+    // if (this.authenticationAttempted) {
+    // 	return this.user
+    // }
+    // this.authenticationAttempted = true
+    // /**
+    //  * Ensure the "Authorization" header value exists
+    //  */
+    // const token = this.getBearerToken()
+    // const { tokenId, value } = this.parsePublicToken(token)
+    // /**
+    //  * Query token and user
+    //  */
+    // const providerToken = await this.getProviderToken(tokenId, value)
+    // const providerUser = await this.getUserById(providerToken.userId)
+    // this.markUserAsLoggedIn(providerUser.user, true)
+    // this.token = providerToken
   }
 
   public async verifyCredentials(uid: string, password: string): Promise<User> {
