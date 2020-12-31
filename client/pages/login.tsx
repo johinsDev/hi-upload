@@ -30,6 +30,11 @@ const LoginPage = () => {
       localStorage.setItem("token", data.token);
 
       queryClient.setQueryData("auth/me", data);
+
+      router.push("/");
+    },
+    onError: () => {
+      alert("TODO ALER ERROR GLOBAL");
     },
   });
 
@@ -43,8 +48,6 @@ const LoginPage = () => {
         },
         "POST",
       ]);
-
-      router.push("/");
     } catch (error) {
       console.log("Error from backend parded");
     } finally {

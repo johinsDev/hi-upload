@@ -14,5 +14,9 @@ export const defaultMutationFn = async ([path, body, method = "POST"]: [
     },
   });
 
+  if (!r.ok) {
+    throw new Error(await r.text());
+  }
+
   return await r.json();
 };

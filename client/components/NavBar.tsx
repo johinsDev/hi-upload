@@ -1,3 +1,4 @@
+import { useRouter } from "next/dist/client/router";
 import Link from "next/link";
 import * as React from "react";
 import { useMutation, useQueryClient } from "react-query";
@@ -8,6 +9,8 @@ export default function NavBar() {
   const { data, isLoading } = useUser();
 
   const queryClient = useQueryClient();
+
+  const router = useRouter();
 
   const { mutate } = useMutation(defaultMutationFn, {
     onSuccess: () => {
@@ -25,13 +28,13 @@ export default function NavBar() {
         <li>
           <Link href="/">
             <a href="" className="text-sm inline-block p-3 text-gray-800">
-              Home {data?.email}
+              Home
             </a>
           </Link>
         </li>
 
         <li>
-          <Link href="/">
+          <Link href="/upload">
             <a href="" className="text-sm inline-block p-3 text-gray-800">
               Your files
             </a>
@@ -75,6 +78,10 @@ export default function NavBar() {
                 className="text-sm inline-block p-3 text-gray-800 focus:outline-none"
                 onClick={() => {
                   mutate(["/auth/logout", {}, "DELETE"]);
+
+                  queryClient.clear();
+
+                  router.push("/");
                 }}
               >
                 Log out

@@ -5,3 +5,8 @@ interface IUser {
   name: string;
   token: string;
 }
+
+interface IFile {
+  name: string;
+  uuid: string;
+}

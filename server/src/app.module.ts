@@ -5,10 +5,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import configuration from './config/configuration';
 import { AuthModule } from './auth/auth.module';
+import { FileModule } from './files/file.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { RedisModule } from './cache/redis.module';
 
-// auth simple token database
+// filter for response all with data
 // compression
 // helmet
 // cors
@@ -76,6 +77,7 @@ import { RedisModule } from './cache/redis.module';
       },
     }),
     AuthModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [AppService, ConfigService],
