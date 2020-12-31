@@ -42,7 +42,7 @@ export class AuthService {
     uid: string,
     password: string,
     options?: JwtSignOptions,
-  ): Promise<{ token: string }> {
+  ): Promise<User & { token: string }> {
     return this.login(await this.verifyCredentials(uid, password), options);
   }
 
@@ -55,7 +55,7 @@ export class AuthService {
   public async login(
     user: User,
     options?: JwtSignOptions,
-  ): Promise<{ token: string }> {
+  ): Promise<User & { token: string }> {
     const token = this.jwt.sign({ [this.uid]: user[this.uid] }, options);
 
     const tokens = await this.tokenRepository.find({
@@ -81,7 +81,7 @@ export class AuthService {
 
     this.markUserAsLoggedIn(user, true);
 
-    return { token };
+    return Object.assign(user, { token });
   }
 
   private getBearerToken(token?: string): string {

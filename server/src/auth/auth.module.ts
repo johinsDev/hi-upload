@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RedisService } from 'src/cache/redis.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { HashService } from './hash.service';

@@ -1,3 +1,4 @@
+import { File } from 'src/files/file.entity';
 import {
   Entity,
   Column,
@@ -28,6 +29,12 @@ export class User extends BaseEntity {
     token => token.user,
   )
   tokens: Token[];
+
+  @OneToMany(
+    () => File,
+    file => file.user,
+  )
+  files: File[];
 
   @Column({ type: 'timestamp', nullable: true })
   emailVerifiedAt: Date | null;
