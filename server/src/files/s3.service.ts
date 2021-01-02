@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 
 export interface Response {
@@ -18,14 +19,14 @@ export default class S3Service {
   protected $driver: S3;
   protected $bucket: string;
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.$driver = new S3({
-      accessKeyId: '',
-      secretAccessKey: '',
-      region: '',
+      accessKeyId: this.configService.get('s3.accessKeyId'),
+      secretAccessKey: this.configService.get('s3.secretAccessKey'),
+      region: this.configService.get('s3.region'),
     });
 
-    this.$bucket = '';
+    this.$bucket = this.configService.get('s3.bucket');
   }
 
   public async getSignedUrl(

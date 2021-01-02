@@ -19,9 +19,9 @@ export default (): {
     connection: process.env.DB_CONNECTION || 'postgres',
   } as TypeOrmModuleOptions,
   jwt: {
-    secret: process.env.jWT_SECRET,
+    secret: process.env.JWT_SECRET,
     signOptions: {
-      expiresIn: process.env.jWT_EXPIRE_IN,
+      expiresIn: process.env.JWT_EXPIRE_IN,
     },
   },
   s3: {
