@@ -22,7 +22,7 @@ export default class FileService {
       '.' +
       data.extension;
 
-    return this.storage.getSignedUrl(fileName);
+    return this.storage.getSignedUrl(`files/${fileName}`);
   }
 
   getAll(user: User): Promise<File[]> {
