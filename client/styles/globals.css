@@ -13,3 +13,12 @@ h1 {
 p {
   @apply text-gray-500;
 }
+
+.filepond--drop-label,
+.filepond--panel-root {
+  @apply bg-gray-200 rounded-lg;
+}
+
+.filepond--file {
+  @apply bg-indigo-500;
+}

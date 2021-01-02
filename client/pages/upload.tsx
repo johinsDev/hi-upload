@@ -1,11 +1,10 @@
 import Files from "../components/Files";
+import Uploader from "../components/Uploader";
 
 const UploadPage = () => {
   return (
     <section>
-      <section className="mb-8">
-        <div>uploader</div>
-      </section>
+      <Uploader />
 
       <Files />
     </section>
