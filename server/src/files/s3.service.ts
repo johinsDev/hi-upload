@@ -20,12 +20,12 @@ export default class S3Service {
 
   constructor() {
     this.$driver = new S3({
-      accessKeyId: 'AKIAV7VLHC226LTTT36K',
-      secretAccessKey: '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',
-      region: 'sa-east-1',
+      accessKeyId: '',
+      secretAccessKey: '',
+      region: '',
     });
 
-    this.$bucket = 'hiupload2';
+    this.$bucket = '';
   }
 
   public async getSignedUrl(
