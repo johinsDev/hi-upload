@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import configuration from './config/configuration';
@@ -79,7 +77,7 @@ import { RedisModule } from './cache/redis.module';
     AuthModule,
     FileModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, ConfigService],
+  controllers: [],
+  providers: [ConfigService],
 })
 export class AppModule {}

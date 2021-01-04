@@ -14,6 +14,10 @@ export interface SignedUrlResponse extends Response {
   signedUrl: string;
 }
 
+export interface DeleteResponse extends Response {
+  wasDeleted: boolean | null;
+}
+
 @Injectable()
 export default class S3Service {
   protected $driver: S3;
@@ -27,6 +31,18 @@ export default class S3Service {
     });
 
     this.$bucket = this.configService.get('s3.bucket');
+  }
+
+  public async delete(location: string): Promise<DeleteResponse> {
+    const params = { Key: location, Bucket: this.$bucket };
+
+    try {
+      const result = await this.$driver.deleteObject(params).promise();
+
+      return { raw: result, wasDeleted: null };
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   public async getSignedUrl(
@@ -45,7 +61,6 @@ export default class S3Service {
         Expires: expiry,
         Conditions: [['content-length-range', 100, 10000000]],
       };
-      // console.log(await this.$driver.getSignedUrlPromise('putObject', params));
 
       return this.$driver.createPresignedPost(params);
     } catch (e) {

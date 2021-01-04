@@ -17,7 +17,9 @@ export class File extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   path: string;
 
   @Column({

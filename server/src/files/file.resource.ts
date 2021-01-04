@@ -1,4 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
+import { User } from 'src/auth/user.entity';
 
 export class FileResource {
   name: string;
@@ -8,6 +9,9 @@ export class FileResource {
 
   @Exclude()
   size: number;
+
+  @Exclude()
+  user: User;
 
   @Exclude()
   path: string;

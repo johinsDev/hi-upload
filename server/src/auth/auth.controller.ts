@@ -9,10 +9,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { RedisService } from 'src/cache/redis.service';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
-import { User } from './user.entity';
 import { UserResource } from './user.resource';
 
 // token repository redis

@@ -6,11 +6,12 @@ import { ConfigService } from 'aws-sdk';
 import { FileController } from './file.controller';
 import { FileRepository } from './file.repository';
 import FileService from './file.service';
+import { FileSubscriber } from './file.subscriber';
 import S3Service from './s3.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([FileRepository]), ConfigModule],
   controllers: [FileController],
-  providers: [FileService, ConfigService, S3Service],
+  providers: [FileService, ConfigService, S3Service, FileSubscriber],
 })
 export class FileModule {}
