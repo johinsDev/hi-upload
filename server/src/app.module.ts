@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { FileModule } from './files/file.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { RedisModule } from './cache/redis.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 // filter for response all with data
 // compression
@@ -59,7 +60,7 @@ import { RedisModule } from './cache/redis.module';
           synchronize: false,
           autoLoadEntities: true,
           namingStrategy: new SnakeNamingStrategy(),
-          logging: true,
+          logging: false,
         } as TypeOrmModuleOptions;
       },
       inject: [ConfigService],
@@ -76,6 +77,7 @@ import { RedisModule } from './cache/redis.module';
     }),
     AuthModule,
     FileModule,
+    SubscriptionModule,
   ],
   controllers: [],
   providers: [ConfigService],

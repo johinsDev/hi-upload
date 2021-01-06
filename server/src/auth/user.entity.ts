@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Token } from './token.entity';
+import { Subscription } from 'src/subscription/entities/subscription.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -35,6 +36,15 @@ export class User extends BaseEntity {
     file => file.user,
   )
   files: File[];
+
+  @OneToMany(
+    () => Subscription,
+    subscription => subscription.user,
+    {
+      cascade: true,
+    },
+  )
+  subscriptions: Subscription[];
 
   @Column({ type: 'timestamp', nullable: true })
   emailVerifiedAt: Date | null;

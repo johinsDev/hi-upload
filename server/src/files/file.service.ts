@@ -26,7 +26,7 @@ export default class FileService {
     return this.storage.getSignedUrl(`files/${fileName}`);
   }
 
-  getAll(): Promise<File[]> {
+  async getAll(): Promise<File[]> {
     return this.fileRepository.find({
       order: {
         createdAt: 'DESC',
