@@ -7,11 +7,11 @@ import { FileModule } from './files/file.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { RedisModule } from './cache/redis.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 // filter for response all with data
 // compression
 // helmet
-// cors
 // csrf
 // rate limiting
 // terminus
@@ -23,10 +23,8 @@ import { SubscriptionModule } from './subscription/subscription.module';
 // auth email, verification
 // auth phone, verification
 // storage
-// cache
 // swagger
 // class-validator --> database validators
-// class transformer
 // queue
 // notification
 // mailer
@@ -35,7 +33,6 @@ import { SubscriptionModule } from './subscription/subscription.module';
 // i18n
 // i18n models
 // cron
-// event emitter
 // excel, pdf, sharp, omnipay
 // audit, role, supcriptions
 // locust, jest, sonarQube, continuos deployment aws, terraform
@@ -43,6 +40,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 // cache typeorm with redis
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       load: [configuration],
     }),

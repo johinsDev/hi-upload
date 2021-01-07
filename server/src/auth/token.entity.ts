@@ -17,6 +17,10 @@ export class Token extends BaseEntity {
   @ManyToOne(
     () => User,
     user => user.tokens,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
   )
   user: User;
 

@@ -10,6 +10,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
+import { interval } from '../period.service';
 import { PlanFeatures } from './plan-features.entity';
 import { Subscription } from './subscription.entity';
 
@@ -85,7 +86,7 @@ export class Plan extends BaseEntity {
   @Column({
     default: 'day',
   })
-  trialInterval: string;
+  trialInterval: interval;
 
   @Column({
     default: 0,
@@ -97,7 +98,7 @@ export class Plan extends BaseEntity {
   @Column({
     default: 'month',
   })
-  invoiceInterval: string;
+  invoiceInterval: interval;
 
   @Column({
     default: 0,

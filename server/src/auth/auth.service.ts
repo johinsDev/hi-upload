@@ -11,6 +11,8 @@ import { REQUEST } from '@nestjs/core';
 import { FastifyRequest } from 'fastify';
 import { Token } from './token.entity';
 import { MoreThan } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EVENT_LOGIN, EVENT_LOGOUT, EVENT_REGISTER } from './auth.constants';
 
 export class InvalidApiToken extends HttpException {
   constructor() {
@@ -34,6 +36,7 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly tokenRepository: TokenRepository,
     @Inject(REQUEST) private readonly request: FastifyRequest,
+    private eventEmitter: EventEmitter2,
   ) {
     this.uid = 'email';
   }
@@ -80,6 +83,8 @@ export class AuthService {
       .save();
 
     this.markUserAsLoggedIn(user, true);
+
+    this.eventEmitter.emit(EVENT_LOGIN);
 
     return Object.assign(user, { token });
   }
@@ -181,6 +186,8 @@ export class AuthService {
     }
 
     this.markUserAsLoggedOut();
+
+    this.eventEmitter.emit(EVENT_LOGOUT);
   }
 
   protected markUserAsLoggedOut(): void {
@@ -202,5 +209,22 @@ export class AuthService {
     });
 
     return this.login(providerUser, options);
+  }
+
+  public async create(
+    { name, email, password }: CreateUser,
+    options?: JwtSignOptions,
+  ): Promise<User & { token: string }> {
+    const user = await this.userRepository
+      .create({
+        email,
+        name,
+        password: await this.hash.hash(password),
+      })
+      .save();
+
+    this.eventEmitter.emit(EVENT_REGISTER, user);
+
+    return this.login(user, options);
   }
 }

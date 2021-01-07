@@ -46,10 +46,8 @@ export class PlanFeatures extends BaseEntity {
   @Column()
   description: string;
 
-  @Column({
-    type: 'bigint',
-  })
-  value: number;
+  @Column()
+  value: string;
 
   @Column({
     default: 'month',

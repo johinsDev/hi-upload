@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Token } from './token.entity';
-import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { Subscription } from '../subscription/entities/subscription.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -28,6 +28,9 @@ export class User extends BaseEntity {
   @OneToMany(
     () => Token,
     token => token.user,
+    {
+      cascade: true,
+    },
   )
   tokens: Token[];
 

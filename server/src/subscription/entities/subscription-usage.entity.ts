@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { PlanFeatures } from './plan-features.entity';
 import { Subscription } from './subscription.entity';
+import * as dayjs from 'dayjs';
 
 @Entity()
 export class SubscriptionUsage extends BaseEntity {
@@ -44,9 +45,8 @@ export class SubscriptionUsage extends BaseEntity {
 
   @Column({
     unsigned: true,
-    type: 'bigint',
   })
-  used: number;
+  used: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -56,4 +56,8 @@ export class SubscriptionUsage extends BaseEntity {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  expired(): boolean {
+    return this.validUntil && dayjs(this.validUntil).isBefore(dayjs());
+  }
 }

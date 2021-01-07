@@ -3,20 +3,24 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Delete,
+  forwardRef,
   Get,
   HttpStatus,
+  Inject,
   Post,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import SubscriptionService from 'src/subscription/services/subscription.service';
+import { EVENT_REGISTER } from './auth.constants';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { User } from './user.entity';
 import { UserResource } from './user.resource';
 
 // token repository redis
-//  emit envet user login, logout
 // validate login
-// class-transformer reponse user
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('/auth')
@@ -24,8 +28,14 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() body: { id: number }): Promise<{ token: string }> {
-    return this.authService.loginViaId(body.id);
+  async register(@Body() body: CreateUser): Promise<UserResource> {
+    const user = await this.authService.create({
+      email: body.email,
+      name: body.name,
+      password: body.password,
+    });
+
+    return new UserResource(user);
   }
 
   @Post('sign-in')

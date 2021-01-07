@@ -55,7 +55,7 @@ export default class PlanService {
 
     planFeature.name = 'Storage';
     planFeature.description = 'Storage size files';
-    planFeature.value = 5000000;
+    planFeature.value = '5000000';
     planFeature.sortOrder = 1;
     planFeature.plans = [plan];
     planFeature.slug = 'storage';

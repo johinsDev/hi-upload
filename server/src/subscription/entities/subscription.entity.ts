@@ -1,4 +1,4 @@
-import { User } from 'src/auth/user.entity';
+import { User } from '../../auth/user.entity';
 import {
   Entity,
   Column,
@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { Plan } from './plan.entity';
 import { SubscriptionUsage } from './subscription-usage.entity';
-
+import * as dayjs from 'dayjs';
 @Entity()
 export class Subscription extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -93,4 +93,20 @@ export class Subscription extends BaseEntity {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  onGracePeriod(): boolean {
+    return this.endsAt && dayjs(this.endsAt).isAfter(dayjs());
+  }
+
+  onTrial(): boolean {
+    return this.trialEndsAt && dayjs(this.trialEndsAt).isAfter(dayjs());
+  }
+
+  active(): boolean {
+    return !this.endsAt || this.onGracePeriod();
+  }
+
+  valid(): boolean {
+    return this.active() || this.onTrial() || this.onGracePeriod();
+  }
 }
