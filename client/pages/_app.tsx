@@ -5,8 +5,10 @@ import {
   QueryClientProvider,
   QueryFunctionContext,
 } from "react-query";
+import Alert from "../components/Alert";
 import NavBar from "../components/NavBar";
 import { API_BASE_URL } from "../shared/env";
+import AlertProvider from "../state/alert";
 import "../styles/globals.css";
 
 export const api = axios.create({
@@ -30,41 +32,40 @@ api.interceptors.request.use(
   }
 );
 
-export const defaultQueryFn = async <T extends any = any>({
-  queryKey,
-}: QueryFunctionContext): Promise<T> => {
-  const r = await fetch(`${API_BASE_URL}/${queryKey[0]}`, {
+export const defaultQueryFn = async ({ queryKey }: QueryFunctionContext) => {
+  const { data } = await api.get(`${queryKey[0]}`, {
     headers: {
       authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   });
 
-  if (r.status !== 200) {
-    throw new Error(await r.text());
-  }
-
-  return await r.json();
+  return data;
 };
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: defaultQueryFn,
+      staleTime: 60 * 1000,
     },
   },
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <main className="w-full md:w-8/12 lg:w-6/12 mx-auto px-6 mt-6 md:mt-20">
-        <header>
-          <NavBar />
-        </header>
+    <AlertProvider>
+      <QueryClientProvider client={queryClient}>
+        <main className="w-full md:w-8/12 lg:w-6/12 mx-auto px-6 mt-6 md:mt-20">
+          <Alert />
 
-        <Component {...pageProps} />
-      </main>
-    </QueryClientProvider>
+          <header>
+            <NavBar />
+          </header>
+
+          <Component {...pageProps} />
+        </main>
+      </QueryClientProvider>
+    </AlertProvider>
   );
 }
 

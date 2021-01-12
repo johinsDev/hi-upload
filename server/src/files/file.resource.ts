@@ -1,26 +1,17 @@
 import { Exclude, Expose } from 'class-transformer';
-import { User } from 'src/auth/user.entity';
-
+@Exclude()
 export class FileResource {
+  @Expose()
   name: string;
 
   @Expose({ name: 'uuid' })
   id: string;
 
-  @Exclude()
+  @Expose()
   size: number;
 
-  @Exclude()
-  user: User;
-
-  @Exclude()
+  @Expose()
   path: string;
-
-  @Exclude()
-  createdAt: Date;
-
-  @Exclude()
-  updateAt: Date;
 
   constructor(partial: Partial<FileResource>) {
     Object.assign(this, partial);

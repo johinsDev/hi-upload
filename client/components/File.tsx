@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "react-query";
 import { api } from "../pages/_app";
+import { SLUG_STORAGE } from "./StorageUsage";
 
 export default function File({ file }: { file: IFile }) {
   const queryClient = useQueryClient();
@@ -23,6 +24,26 @@ export default function File({ file }: { file: IFile }) {
           "files",
           (files) => files?.filter((f) => f.uuid !== uuid) ?? []
         );
+
+        const prevSubscription = queryClient.getQueryData<ISubscription>(
+          "/subscription/me"
+        );
+
+        queryClient.setQueryData("/subscription/me", () => {
+          return {
+            ...prevSubscription,
+            usages: prevSubscription?.usages.map((usage) => {
+              if (usage.feature.slug.includes(SLUG_STORAGE)) {
+                return {
+                  ...usage,
+                  used: usage.used - file.size,
+                };
+              }
+
+              return usage;
+            }),
+          };
+        });
 
         return { previousFiles };
       },

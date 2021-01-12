@@ -5,6 +5,7 @@ import axios from "axios";
 import { api } from "../pages/_app";
 import { useMutation, useQueryClient } from "react-query";
 import { v4 as uuidv4 } from "uuid";
+import { SLUG_STORAGE } from "./StorageUsage";
 
 interface Fields {
   bucket: string;
@@ -25,7 +26,7 @@ interface IResponse {
 interface IData {
   path: string;
   name: string;
-  size: string;
+  size: number;
 }
 
 export default function Uploader() {
@@ -33,7 +34,12 @@ export default function Uploader() {
 
   const queryClient = useQueryClient();
 
-  const { mutate } = useMutation<any, any, IData, { previousFiles: IFile[] }>(
+  const { mutate } = useMutation<
+    any,
+    any,
+    IData,
+    { previousFiles: IFile[]; prevSubscription?: ISubscription }
+  >(
     (data) => {
       return api.post("files", data);
     },
@@ -44,15 +50,44 @@ export default function Uploader() {
         const previousFiles = queryClient.getQueryData<IFile[]>("files") ?? [];
 
         queryClient.setQueryData<IFile[]>("files", (files) => [
-          { name: newFile.name, uuid: uuidv4() },
+          { name: newFile.name, uuid: uuidv4(), size: newFile.size },
           ...(files ?? []),
         ]);
 
-        return { previousFiles };
+        const prevSubscription = queryClient.getQueryData<ISubscription>(
+          "/subscription/me"
+        );
+
+        queryClient.setQueryData("/subscription/me", () => {
+          return {
+            ...prevSubscription,
+            usages: prevSubscription?.usages.map((usage) => {
+              if (usage.feature.slug.includes(SLUG_STORAGE)) {
+                return {
+                  ...usage,
+                  used: usage.used + newFile.size,
+                };
+              }
+
+              return usage;
+            }),
+          };
+        });
+
+        return { previousFiles, prevSubscription };
       },
-      onError: (_, __, context) => {
+      onError: (error, __, context) => {
+        console.log("ERROR", error.response.data);
+
         if (context?.previousFiles) {
           queryClient.setQueryData("files", context?.previousFiles);
+        }
+
+        if (context?.prevSubscription) {
+          queryClient.setQueryData(
+            "/subscription/me",
+            context?.prevSubscription
+          );
         }
       },
       onSettled: () => {
@@ -79,7 +114,6 @@ export default function Uploader() {
               const { data } = await api.post<IResponse>("files/signed", {
                 name: metadata.fileInfo.name,
                 extension: metadata.fileInfo.extension,
-                size: metadata.fileInfo.size,
               });
 
               Object.keys(data.fields).forEach((field) => {
@@ -109,7 +143,7 @@ export default function Uploader() {
                 },
               };
             } catch (error) {
-              console.log("ERROR", error);
+              console.log("ERROR", error.response.data);
             }
           },
         }}
@@ -118,15 +152,19 @@ export default function Uploader() {
             return;
           }
 
-          await mutate({
-            path: file.serverId,
-            name: file.filename,
-            size: file.fileSize.toString(),
-          });
-
-          setTimeout(() => {
-            pond.current?.removeFile(file);
-          }, 500);
+          mutate(
+            {
+              path: file.serverId,
+              name: file.filename,
+              // file.fileSize
+              size: 0,
+            },
+            {
+              onSuccess: () => {
+                pond.current?.removeFile(file);
+              },
+            }
+          );
         }}
         onaddfile={(error, file) => {
           if (error) {

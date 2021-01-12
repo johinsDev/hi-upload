@@ -37,6 +37,9 @@ export class User extends BaseEntity {
   @OneToMany(
     () => File,
     file => file.user,
+    {
+      cascade: true,
+    },
   )
   files: File[];
 
@@ -47,7 +50,7 @@ export class User extends BaseEntity {
       cascade: true,
     },
   )
-  subscriptions: Subscription[];
+  subscriptions: Promise<Subscription[]>;
 
   @Column({ type: 'timestamp', nullable: true })
   emailVerifiedAt: Date | null;

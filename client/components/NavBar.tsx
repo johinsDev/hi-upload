@@ -4,6 +4,7 @@ import * as React from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { defaultMutationFn } from "../shared/api";
 import useUser from "../shared/useUser";
+import StorageUsage from "./StorageUsage";
 
 export default function NavBar() {
   const { data, isLoading } = useUser();
@@ -41,6 +42,10 @@ export default function NavBar() {
           </Link>
         </li>
       </ul>
+
+      <div className="flex justify-center order-last w-full md:w-auto md:order-none">
+        {isAuthenticated && <StorageUsage />}
+      </div>
 
       <ul className="flex items-center">
         {!isAuthenticated && (

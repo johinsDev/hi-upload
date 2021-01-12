@@ -7,8 +7,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
 import { interval } from '../period.service';
 import { PlanFeatures } from './plan-features.entity';
@@ -22,9 +20,9 @@ export class Plan extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToMany(
+  @OneToMany(
     () => PlanFeatures,
-    planFeature => planFeature.plans,
+    planFeature => planFeature.plan,
     {
       cascade: true,
     },

@@ -1,14 +1,12 @@
 import {
   ClassSerializerInterceptor,
   Controller,
-  Patch,
-  Post,
+  Get,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { User } from 'src/auth/user.entity';
-import { Subscription } from '../entities/subscription.entity';
+import { SubscriptionResource } from '../resources/subscription.resource';
 import SubscriptionService from '../services/subscription.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -17,13 +15,10 @@ import SubscriptionService from '../services/subscription.service';
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
-  // @Post()
-  // async store(): Promise<Subscription> {
-  //   return this.subscriptionService.create();
-  // }
+  @Get('/me')
+  async me(): Promise<SubscriptionResource> {
+    const subscription = await this.subscriptionService.subscription();
 
-  @Patch('swap')
-  async swap(): Promise<any> {
-    return this.subscriptionService.canUseFeature('storage');
+    return new SubscriptionResource(subscription);
   }
 }

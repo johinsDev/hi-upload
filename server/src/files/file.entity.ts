@@ -31,6 +31,10 @@ export class File extends BaseEntity {
   @ManyToOne(
     () => User,
     user => user.files,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
   )
   user: User;
 

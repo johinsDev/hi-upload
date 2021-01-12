@@ -8,6 +8,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { RedisModule } from './cache/redis.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SubscriptionUsageGuard } from './subscription/subscription-usage.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 // filter for response all with data
 // compression
@@ -22,6 +24,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 // auth social
 // auth email, verification
 // auth phone, verification
+// device tracking
+// history password
 // storage
 // swagger
 // class-validator --> database validators
@@ -74,8 +78,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       },
     }),
     AuthModule,
-    FileModule,
     SubscriptionModule,
+    FileModule,
   ],
   controllers: [],
   providers: [ConfigService],

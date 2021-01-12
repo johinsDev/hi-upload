@@ -4,13 +4,16 @@ import { Subscription } from '../entities/subscription.entity';
 
 @EntityRepository(Subscription)
 export class SubscriptionRepository extends Repository<Subscription> {
-  subscription(user: User, name?: string): Promise<Subscription | undefined> {
+  async subscription(
+    user: User,
+    name?: string,
+  ): Promise<Subscription | undefined> {
     return this.findOne({
-      select: ['id'],
+      relations: ['plan', 'plan.features', 'usages', 'usages.feature'],
       where: [
         {
-          name: name ?? 'default',
           user,
+          name: name || 'default',
         },
       ],
     });

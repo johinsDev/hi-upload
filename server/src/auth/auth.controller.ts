@@ -6,17 +6,12 @@ import {
   forwardRef,
   Get,
   HttpStatus,
-  Inject,
   Post,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import SubscriptionService from 'src/subscription/services/subscription.service';
-import { EVENT_REGISTER } from './auth.constants';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
-import { User } from './user.entity';
 import { UserResource } from './user.resource';
 
 // token repository redis

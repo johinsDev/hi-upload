@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { HashService } from './hash.service';
@@ -7,7 +13,6 @@ import * as ms from 'ms';
 import { UserRepository } from './user.repository';
 import { TokenRepository } from './token.repository';
 import * as days from 'dayjs';
-import { REQUEST } from '@nestjs/core';
 import { FastifyRequest } from 'fastify';
 import { Token } from './token.entity';
 import { MoreThan } from 'typeorm';
@@ -35,7 +40,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly tokenRepository: TokenRepository,
-    @Inject(REQUEST) private readonly request: FastifyRequest,
+    @Inject(forwardRef(() => EventEmitter2))
     private eventEmitter: EventEmitter2,
   ) {
     this.uid = 'email';
@@ -84,7 +89,7 @@ export class AuthService {
 
     this.markUserAsLoggedIn(user, true);
 
-    this.eventEmitter.emit(EVENT_LOGIN);
+    this.eventEmitter.emit(EVENT_LOGIN, user);
 
     return Object.assign(user, { token });
   }
@@ -103,14 +108,14 @@ export class AuthService {
     return value;
   }
 
-  public async authenticate(): Promise<User> {
+  public async authenticate(request: FastifyRequest): Promise<User> {
     if (this.authenticationAttempted) {
       return this.user;
     }
 
     this.authenticationAttempted = true;
 
-    const token = this.getBearerToken(this.request.headers.authorization);
+    const token = this.getBearerToken(request.headers.authorization);
 
     try {
       this.jwt.verify(token);
@@ -131,12 +136,14 @@ export class AuthService {
 
       return providerToken.user;
     } catch (error) {
+      console.log('error', error);
+
       throw new InvalidApiToken();
     }
   }
 
-  public async check(): Promise<boolean> {
-    await this.authenticate();
+  public async check(request: FastifyRequest): Promise<boolean> {
+    await this.authenticate(request);
 
     return this.isAuthenticated;
   }
@@ -177,10 +184,6 @@ export class AuthService {
   }
 
   public async logout(): Promise<void> {
-    if (!this.authenticationAttempted) {
-      await this.check();
-    }
-
     if (this.token) {
       await this.token.remove();
     }

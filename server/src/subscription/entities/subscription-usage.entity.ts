@@ -35,7 +35,7 @@ export class SubscriptionUsage extends BaseEntity {
       onDelete: 'CASCADE',
     },
   )
-  features: PlanFeatures;
+  feature: PlanFeatures;
 
   @Column({
     type: 'timestamp',
